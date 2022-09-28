@@ -41,5 +41,5 @@ jobs:
           TRINO_VERSION=$(./mvnw  -f ./pom.xml --quiet help:evaluate -Dexpression=project.version -DforceStdout)
           echo TRINO_VERSION: $TRINO_VERSION
           IMAGE_TAG=${TRINO_VERSION}-amd64
-          docker tag trino:$IMAGE_TAG ghcr.io/zettablock/trino:$IMAGE_TAG
-          docker push ghcr.io/zettablock/trino:$IMAGE_TAG
+          docker tag trino:$IMAGE_TAG ghcr.io/zettablock/trino-public:$IMAGE_TAG
+          docker push ghcr.io/zettablock/trino-public:$IMAGE_TAG
