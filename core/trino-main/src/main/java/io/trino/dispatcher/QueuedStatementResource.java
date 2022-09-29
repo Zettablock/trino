@@ -427,7 +427,9 @@ public class QueuedStatementResource
             Optional<URI> queryInfoUrlFinal = queryInfoUrl;
 
             if (queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty()) {
-                nextUri = UriBuilder.fromUri(nextUri).scheme(queryResultUrlScheme.get()).build();
+                if (nextUri != null) {
+                    nextUri = UriBuilder.fromUri(nextUri).scheme(queryResultUrlScheme.get()).build();
+                }
 
                 if (queryInfoUrlFinal.isPresent()) {
                     queryInfoUrlFinal = Optional.of(UriBuilder.fromUri(queryInfoUrlFinal.get()).scheme(queryResultUrlScheme.get()).build());
