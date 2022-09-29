@@ -273,12 +273,13 @@ public class QueuedStatementResource
             UriInfo uriInfo,
             Optional<URI> queryInfoUrl,
             Duration elapsedTime,
-            Duration queuedTime)
+            Duration queuedTime,
+            Optional<String> queryResultUrlScheme)
     {
         QueryState state = queryError.map(error -> FAILED).orElse(QUEUED);
         return new QueryResults(
                 queryId.toString(),
-                getQueryInfoUri(queryInfoUrl, queryId, uriInfo),
+                getQueryInfoUri(queryInfoUrl, queryId, uriInfo, queryResultUrlScheme),
                 null,
                 nextUri,
                 null,
@@ -437,7 +438,8 @@ public class QueuedStatementResource
                     uriInfo,
                     queryInfoUrlFinal,
                     dispatchInfo.getElapsedTime(),
-                    dispatchInfo.getQueuedTime());
+                    dispatchInfo.getQueuedTime(),
+                    queryResultUrlScheme);
         }
 
         private URI getNextUri(long token, UriInfo uriInfo, DispatchInfo dispatchInfo)

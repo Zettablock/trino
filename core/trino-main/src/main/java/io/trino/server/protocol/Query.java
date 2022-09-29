@@ -111,6 +111,8 @@ class Query
     private final PagesSerde serde;
     private final boolean supportsParametricDateTime;
 
+    private final Optional<String> queryResultUrlScheme;
+
     @GuardedBy("this")
     private OptionalLong nextToken = OptionalLong.of(0);
 
@@ -174,7 +176,8 @@ class Query
             ExchangeManagerRegistry exchangeManagerRegistry,
             Executor dataProcessorExecutor,
             ScheduledExecutorService timeoutExecutor,
-            BlockEncodingSerde blockEncodingSerde)
+            BlockEncodingSerde blockEncodingSerde,
+            Optional<String> queryResultUrlScheme)
     {
         ExchangeDataSource exchangeDataSource = new LazyExchangeDataSource(
                 session.getQueryId(),
@@ -185,7 +188,7 @@ class Query
                 getRetryPolicy(session),
                 exchangeManagerRegistry);
 
-        Query result = new Query(session, slug, queryManager, queryInfoUrl, exchangeDataSource, dataProcessorExecutor, timeoutExecutor, blockEncodingSerde);
+        Query result = new Query(session, slug, queryManager, queryInfoUrl, exchangeDataSource, dataProcessorExecutor, timeoutExecutor, blockEncodingSerde, queryResultUrlScheme);
 
         result.queryManager.setOutputInfoListener(result.getQueryId(), result::setQueryOutputInfo);
 
@@ -209,7 +212,8 @@ class Query
             ExchangeDataSource exchangeDataSource,
             Executor resultsProcessorExecutor,
             ScheduledExecutorService timeoutExecutor,
-            BlockEncodingSerde blockEncodingSerde)
+            BlockEncodingSerde blockEncodingSerde,
+            Optional<String> queryResultUrlScheme)
     {
         requireNonNull(session, "session is null");
         requireNonNull(slug, "slug is null");
@@ -229,6 +233,7 @@ class Query
         this.resultsProcessorExecutor = resultsProcessorExecutor;
         this.timeoutExecutor = timeoutExecutor;
         this.supportsParametricDateTime = session.getClientCapabilities().contains(ClientCapabilities.PARAMETRIC_DATETIME.toString());
+        this.queryResultUrlScheme = queryResultUrlScheme;
         serde = new PagesSerdeFactory(blockEncodingSerde, isExchangeCompressionEnabled(session)).createPagesSerde();
     }
 
@@ -487,7 +492,7 @@ class Query
         // first time through, self is null
         QueryResults queryResults = new QueryResults(
                 queryId.toString(),
-                getQueryInfoUri(queryInfoUrl, queryId, uriInfo),
+                getQueryInfoUri(queryInfoUrl, queryId, uriInfo, queryResultUrlScheme),
                 partialCancelUri,
                 nextResultsUri,
                 resultRows.getColumns().orElse(null),

@@ -17,6 +17,7 @@ import io.trino.server.ServerConfig;
 import io.trino.spi.QueryId;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import java.net.URI;
@@ -50,11 +51,15 @@ public class QueryInfoUrlFactory
                 .map(URI::create);
     }
 
-    public static URI getQueryInfoUri(Optional<URI> queryInfoUrl, QueryId queryId, UriInfo uriInfo)
+    public static URI getQueryInfoUri(Optional<URI> queryInfoUrl, QueryId queryId, UriInfo uriInfo, Optional<String> queryResultUrlScheme)
     {
+        UriBuilder uriBuilder = uriInfo.getRequestUriBuilder();
+        if (queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty()) {
+            uriBuilder = uriBuilder.scheme(queryResultUrlScheme.get());
+        }
+        UriBuilder uriBuilderFinal = uriBuilder;
         return queryInfoUrl.orElseGet(() ->
-                uriInfo.getRequestUriBuilder()
-                        .replacePath("ui/query.html")
+                uriBuilderFinal.replacePath("ui/query.html")
                         .replaceQuery(queryId.toString())
                         .build());
     }

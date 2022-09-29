@@ -52,6 +52,7 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URLEncoder;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -93,6 +94,8 @@ public class ExecutingStatementResource
     private final PreparedStatementEncoder preparedStatementEncoder;
     private final boolean compressionEnabled;
 
+    private final Optional<String> queryResultUrlScheme;
+
     @Inject
     public ExecutingStatementResource(
             QueryManager queryManager,
@@ -114,6 +117,7 @@ public class ExecutingStatementResource
         this.timeoutExecutor = requireNonNull(timeoutExecutor, "timeoutExecutor is null");
         this.preparedStatementEncoder = requireNonNull(preparedStatementEncoder, "preparedStatementEncoder is null");
         this.compressionEnabled = serverConfig.isQueryResultsCompressionEnabled();
+        this.queryResultUrlScheme = serverConfig.getQueryResultUrlScheme();
 
         queryPurger.scheduleWithFixedDelay(
                 () -> {
@@ -206,7 +210,8 @@ public class ExecutingStatementResource
                 exchangeManagerRegistry,
                 responseExecutor,
                 timeoutExecutor,
-                blockEncodingSerde));
+                blockEncodingSerde,
+                queryResultUrlScheme));
         return query;
     }
 
