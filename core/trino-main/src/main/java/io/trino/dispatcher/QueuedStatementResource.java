@@ -116,6 +116,9 @@ public class QueuedStatementResource
 
     private final boolean compressionEnabled;
     private final Optional<String> alternateHeaderName;
+
+    private final Optional<String> queryResultUrlScheme;
+
     private final QueryManager queryManager;
 
     @Inject
@@ -135,6 +138,7 @@ public class QueuedStatementResource
         this.queryInfoUrlFactory = requireNonNull(queryInfoUrlTemplate, "queryInfoUrlTemplate is null");
         this.compressionEnabled = serverConfig.isQueryResultsCompressionEnabled();
         this.alternateHeaderName = protocolConfig.getAlternateHeaderName();
+        this.queryResultUrlScheme = serverConfig.getQueryResultUrlScheme();
         queryManager = new QueryManager(queryManagerConfig.getClientTimeout());
     }
 
@@ -165,7 +169,7 @@ public class QueuedStatementResource
 
         Query query = registerQuery(statement, servletRequest, httpHeaders);
 
-        return createQueryResultsResponse(query.getQueryResults(query.getLastToken(), uriInfo));
+        return createQueryResultsResponse(query.getQueryResults(query.getLastToken(), uriInfo, queryResultUrlScheme));
     }
 
     private Query registerQuery(String statement, HttpServletRequest servletRequest, HttpHeaders httpHeaders)
@@ -215,7 +219,7 @@ public class QueuedStatementResource
                 .withTimeout(waitMillis, MILLISECONDS, timeoutExecutor)
                 .catching(TimeoutException.class, ignored -> null, directExecutor())
                 // when state changes, fetch the next result
-                .transform(ignored -> query.getQueryResults(token, uriInfo), responseExecutor)
+                .transform(ignored -> query.getQueryResults(token, uriInfo, queryResultUrlScheme), responseExecutor)
                 .transform(this::createQueryResultsResponse, directExecutor());
     }
 
@@ -371,7 +375,7 @@ public class QueuedStatementResource
             }
         }
 
-        public QueryResults getQueryResults(long token, UriInfo uriInfo)
+        public QueryResults getQueryResults(long token, UriInfo uriInfo, Optional<String> queryResultUrlScheme)
         {
             long lastToken = this.lastToken.get();
             // token should be the last token or the next token
@@ -386,7 +390,8 @@ public class QueuedStatementResource
                 return createQueryResults(
                         token + 1,
                         uriInfo,
-                        DispatchInfo.queued(NO_DURATION, NO_DURATION));
+                        DispatchInfo.queued(NO_DURATION, NO_DURATION),
+                        queryResultUrlScheme);
             }
 
             DispatchInfo dispatchInfo = dispatchManager.getDispatchInfo(queryId)
@@ -395,7 +400,7 @@ public class QueuedStatementResource
                             .status(NOT_FOUND)
                             .build()));
 
-            return createQueryResults(token + 1, uriInfo, dispatchInfo);
+            return createQueryResults(token + 1, uriInfo, dispatchInfo, queryResultUrlScheme);
         }
 
         public void cancel()
@@ -408,9 +413,19 @@ public class QueuedStatementResource
             sessionContext.getIdentity().destroy();
         }
 
-        private QueryResults createQueryResults(long token, UriInfo uriInfo, DispatchInfo dispatchInfo)
+        private QueryResults createQueryResults(long token, UriInfo uriInfo, DispatchInfo dispatchInfo, Optional<String> queryResultUrlScheme)
         {
             URI nextUri = getNextUri(token, uriInfo, dispatchInfo);
+
+            Optional<URI> queryInfoUrlFinal = queryInfoUrl;
+
+            if (queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty()) {
+                nextUri = UriBuilder.fromUri(nextUri).scheme(queryResultUrlScheme.get()).build();
+
+                if (queryInfoUrlFinal.isPresent()) {
+                    queryInfoUrlFinal = Optional.of(UriBuilder.fromUri(queryInfoUrlFinal.get()).scheme(queryResultUrlScheme.get()).build());
+                }
+            }
 
             Optional<QueryError> queryError = dispatchInfo.getFailureInfo()
                     .map(this::toQueryError);
@@ -420,7 +435,7 @@ public class QueuedStatementResource
                     nextUri,
                     queryError,
                     uriInfo,
-                    queryInfoUrl,
+                    queryInfoUrlFinal,
                     dispatchInfo.getElapsedTime(),
                     dispatchInfo.getQueuedTime());
         }
