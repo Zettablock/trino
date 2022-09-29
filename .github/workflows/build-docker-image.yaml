@@ -40,6 +40,8 @@ jobs:
           docker images
           TRINO_VERSION=$(./mvnw  -f ./pom.xml --quiet help:evaluate -Dexpression=project.version -DforceStdout)
           echo TRINO_VERSION: $TRINO_VERSION
-          IMAGE_TAG=${TRINO_VERSION}-amd64-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}
-          docker tag trino:$IMAGE_TAG ghcr.io/zettablock/trino-public:$IMAGE_TAG
-          docker push ghcr.io/zettablock/trino-public:$IMAGE_TAG
+          OLD_IMAGE_TAG=${TRINO_VERSION}-amd64
+          NEW_IMAGE_TAG=${OLD_IMAGE_TAG}-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}
+          docker tag trino:$OLD_IMAGE_TAG ghcr.io/zettablock/trino-public:$NEW_IMAGE_TAG
+          docker push ghcr.io/zettablock/trino-public:$NEW_IMAGE_TAG
+          echo Published docker image ghcr.io/zettablock/trino-public:$NEW_IMAGE_TAG
