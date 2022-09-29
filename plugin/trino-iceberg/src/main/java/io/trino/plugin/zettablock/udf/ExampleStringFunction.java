@@ -20,6 +20,8 @@ import io.trino.spi.function.ScalarFunction;
 import io.trino.spi.function.SqlType;
 import io.trino.spi.type.StandardTypes;
 
+import java.util.Locale;
+
 public class ExampleStringFunction
 {
     private ExampleStringFunction()
@@ -32,6 +34,6 @@ public class ExampleStringFunction
     public static Slice lowercaser(@SqlType(StandardTypes.VARCHAR) Slice slice)
     {
         String argument = slice.toStringUtf8();
-        return Slices.utf8Slice(argument.toLowerCase());
+        return Slices.utf8Slice(argument.toLowerCase(Locale.getDefault()));
     }
 }
