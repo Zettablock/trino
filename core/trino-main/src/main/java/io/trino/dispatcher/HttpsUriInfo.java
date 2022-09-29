@@ -23,7 +23,8 @@ import java.net.URI;
 import java.util.List;
 
 public class HttpsUriInfo
-        implements UriInfo {
+        implements UriInfo
+{
     private final UriInfo originalUriInfo;
 
     public HttpsUriInfo(UriInfo originalUriInfo)
