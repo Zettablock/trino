@@ -32,6 +32,8 @@ public class ServerConfig
     private boolean queryResultsCompressionEnabled = true;
     private Optional<String> queryInfoUrlTemplate = Optional.empty();
 
+    private Optional<String> queryResultUrlScheme = Optional.empty();
+
     public boolean isCoordinator()
     {
         return coordinator;
@@ -103,6 +105,19 @@ public class ServerConfig
     public ServerConfig setQueryInfoUrlTemplate(String queryInfoUrlTemplate)
     {
         this.queryInfoUrlTemplate = Optional.ofNullable(queryInfoUrlTemplate);
+        return this;
+    }
+
+    @NotNull
+    public Optional<String> getQueryResultUrlScheme()
+    {
+        return queryResultUrlScheme;
+    }
+
+    @Config("query.result-url-scheme")
+    public ServerConfig setQueryResultUrlScheme(String queryResultUrlScheme)
+    {
+        this.queryResultUrlScheme = Optional.ofNullable(queryResultUrlScheme);
         return this;
     }
 }
