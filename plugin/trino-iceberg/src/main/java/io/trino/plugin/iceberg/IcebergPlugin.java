@@ -15,6 +15,7 @@ package io.trino.plugin.iceberg;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.trino.plugin.zettablock.udf.ConvertHexToBigIntegerStringFunction;
 import io.trino.plugin.zettablock.udf.ExampleStringFunction;
 import io.trino.spi.Plugin;
 import io.trino.spi.connector.ConnectorFactory;
@@ -35,6 +36,7 @@ public class IcebergPlugin
     {
         return ImmutableSet.<Class<?>>builder()
                 .add(ExampleStringFunction.class)
+                .add(ConvertHexToBigIntegerStringFunction.class)
                 .build();
     }
 }
