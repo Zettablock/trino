@@ -32,7 +32,7 @@ public class ServerConfig
     private boolean queryResultsCompressionEnabled = true;
     private Optional<String> queryInfoUrlTemplate = Optional.empty();
 
-    private Optional<String> queryResultUrlScheme = Optional.empty();
+    private Optional<String> queryResponseUrlScheme = Optional.empty();
 
     public boolean isCoordinator()
     {
@@ -109,20 +109,20 @@ public class ServerConfig
     }
 
     @NotNull
-    public Optional<String> getQueryResultUrlScheme()
+    public Optional<String> getQueryResponseUrlScheme()
     {
-        return queryResultUrlScheme;
+        return queryResponseUrlScheme;
     }
 
-    @Config("query.result-url-scheme")
-    public ServerConfig setQueryResultUrlScheme(String queryResultUrlScheme)
+    @Config("query.response-url-scheme")
+    public ServerConfig setQueryResponseUrlScheme(String queryResponseUrlScheme)
     {
-        this.queryResultUrlScheme = Optional.ofNullable(queryResultUrlScheme);
+        this.queryResponseUrlScheme = Optional.ofNullable(queryResponseUrlScheme);
         return this;
     }
 
     public boolean useHttpsUrlInResponse()
     {
-        return queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty();
+        return queryResponseUrlScheme.isPresent() && queryResponseUrlScheme.get() != null && !queryResponseUrlScheme.get().isEmpty();
     }
 }
