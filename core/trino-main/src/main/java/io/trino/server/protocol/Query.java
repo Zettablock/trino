@@ -57,6 +57,7 @@ import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import java.net.URI;
@@ -111,7 +112,7 @@ class Query
     private final PagesSerde serde;
     private final boolean supportsParametricDateTime;
 
-    private final Optional<String> queryResultUrlScheme;
+    private final boolean useHttpsUrlInResponse;
 
     @GuardedBy("this")
     private OptionalLong nextToken = OptionalLong.of(0);
@@ -177,7 +178,7 @@ class Query
             Executor dataProcessorExecutor,
             ScheduledExecutorService timeoutExecutor,
             BlockEncodingSerde blockEncodingSerde,
-            Optional<String> queryResultUrlScheme)
+            boolean useHttpsUrlInResponse)
     {
         ExchangeDataSource exchangeDataSource = new LazyExchangeDataSource(
                 session.getQueryId(),
@@ -188,7 +189,7 @@ class Query
                 getRetryPolicy(session),
                 exchangeManagerRegistry);
 
-        Query result = new Query(session, slug, queryManager, queryInfoUrl, exchangeDataSource, dataProcessorExecutor, timeoutExecutor, blockEncodingSerde, queryResultUrlScheme);
+        Query result = new Query(session, slug, queryManager, queryInfoUrl, exchangeDataSource, dataProcessorExecutor, timeoutExecutor, blockEncodingSerde, useHttpsUrlInResponse);
 
         result.queryManager.setOutputInfoListener(result.getQueryId(), result::setQueryOutputInfo);
 
@@ -213,7 +214,7 @@ class Query
             Executor resultsProcessorExecutor,
             ScheduledExecutorService timeoutExecutor,
             BlockEncodingSerde blockEncodingSerde,
-            Optional<String> queryResultUrlScheme)
+            boolean useHttpsUrlInResponse)
     {
         requireNonNull(session, "session is null");
         requireNonNull(slug, "slug is null");
@@ -233,7 +234,7 @@ class Query
         this.resultsProcessorExecutor = resultsProcessorExecutor;
         this.timeoutExecutor = timeoutExecutor;
         this.supportsParametricDateTime = session.getClientCapabilities().contains(ClientCapabilities.PARAMETRIC_DATETIME.toString());
-        this.queryResultUrlScheme = queryResultUrlScheme;
+        this.useHttpsUrlInResponse = useHttpsUrlInResponse;
         serde = new PagesSerdeFactory(blockEncodingSerde, isExchangeCompressionEnabled(session)).createPagesSerde();
     }
 
@@ -463,9 +464,9 @@ class Query
         URI partialCancelUri = null;
         if (nextToken.isPresent()) {
             long nextToken = this.nextToken.getAsLong();
-            nextResultsUri = createNextResultsUri(uriInfo, nextToken);
+            nextResultsUri = createNextResultsUri(uriInfo, nextToken, useHttpsUrlInResponse);
             partialCancelUri = findCancelableLeafStage(queryInfo)
-                    .map(stage -> createPartialCancelUri(stage, uriInfo, nextToken))
+                    .map(stage -> createPartialCancelUri(stage, uriInfo, nextToken, useHttpsUrlInResponse))
                     .orElse(null);
         }
 
@@ -492,7 +493,7 @@ class Query
         // first time through, self is null
         QueryResults queryResults = new QueryResults(
                 queryId.toString(),
-                getQueryInfoUri(queryInfoUrl, queryId, uriInfo, queryResultUrlScheme),
+                getQueryInfoUri(queryInfoUrl, queryId, uriInfo, useHttpsUrlInResponse),
                 partialCancelUri,
                 nextResultsUri,
                 resultRows.getColumns().orElse(null),
@@ -608,10 +609,13 @@ class Query
         return Futures.transformAsync(queryManager.getStateChange(queryId, currentState), this::queryDoneFuture, directExecutor());
     }
 
-    private synchronized URI createNextResultsUri(UriInfo uriInfo, long nextToken)
+    private synchronized URI createNextResultsUri(UriInfo uriInfo, long nextToken, boolean useHttpsUrlInResponse)
     {
-        return uriInfo.getBaseUriBuilder()
-                .replacePath("/v1/statement/executing")
+        UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+        if (useHttpsUrlInResponse) {
+            uriBuilder = uriBuilder.scheme("https");
+        }
+        return uriBuilder.replacePath("/v1/statement/executing")
                 .path(queryId.toString())
                 .path(slug.makeSlug(EXECUTING_QUERY, nextToken))
                 .path(String.valueOf(nextToken))
@@ -619,10 +623,13 @@ class Query
                 .build();
     }
 
-    private URI createPartialCancelUri(int stage, UriInfo uriInfo, long nextToken)
+    private URI createPartialCancelUri(int stage, UriInfo uriInfo, long nextToken, boolean useHttpsUrlInResponse)
     {
-        return uriInfo.getBaseUriBuilder()
-                .replacePath("/v1/statement/executing/partialCancel")
+        UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+        if (useHttpsUrlInResponse) {
+            uriBuilder = uriBuilder.scheme("https");
+        }
+        return uriBuilder.replacePath("/v1/statement/executing/partialCancel")
                 .path(queryId.toString())
                 .path(String.valueOf(stage))
                 .path(slug.makeSlug(EXECUTING_QUERY, nextToken))

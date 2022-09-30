@@ -117,7 +117,7 @@ public class QueuedStatementResource
     private final boolean compressionEnabled;
     private final Optional<String> alternateHeaderName;
 
-    private final Optional<String> queryResultUrlScheme;
+    private final boolean useHttpsUrlInResponse;
 
     private final QueryManager queryManager;
 
@@ -138,7 +138,7 @@ public class QueuedStatementResource
         this.queryInfoUrlFactory = requireNonNull(queryInfoUrlTemplate, "queryInfoUrlTemplate is null");
         this.compressionEnabled = serverConfig.isQueryResultsCompressionEnabled();
         this.alternateHeaderName = protocolConfig.getAlternateHeaderName();
-        this.queryResultUrlScheme = serverConfig.getQueryResultUrlScheme();
+        this.useHttpsUrlInResponse = serverConfig.useHttpsUrlInResponse();
         queryManager = new QueryManager(queryManagerConfig.getClientTimeout());
     }
 
@@ -163,7 +163,7 @@ public class QueuedStatementResource
             @Context HttpHeaders httpHeaders,
             @Context UriInfo uriInfo)
     {
-        if (queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty()) {
+        if (useHttpsUrlInResponse) {
             uriInfo = new HttpsUriInfo(uriInfo);
         }
         if (isNullOrEmpty(statement)) {
@@ -172,7 +172,7 @@ public class QueuedStatementResource
 
         Query query = registerQuery(statement, servletRequest, httpHeaders);
 
-        return createQueryResultsResponse(query.getQueryResults(query.getLastToken(), uriInfo, queryResultUrlScheme));
+        return createQueryResultsResponse(query.getQueryResults(query.getLastToken(), uriInfo, useHttpsUrlInResponse));
     }
 
     private Query registerQuery(String statement, HttpServletRequest servletRequest, HttpHeaders httpHeaders)
@@ -207,7 +207,7 @@ public class QueuedStatementResource
             @Context UriInfo uriInfo,
             @Suspended AsyncResponse asyncResponse)
     {
-        if (queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty()) {
+        if (useHttpsUrlInResponse) {
             uriInfo = new HttpsUriInfo(uriInfo);
         }
         Query query = getQuery(queryId, slug, token);
@@ -225,7 +225,7 @@ public class QueuedStatementResource
                 .withTimeout(waitMillis, MILLISECONDS, timeoutExecutor)
                 .catching(TimeoutException.class, ignored -> null, directExecutor())
                 // when state changes, fetch the next result
-                .transform(ignored -> query.getQueryResults(token, uriInfo, queryResultUrlScheme), responseExecutor)
+                .transform(ignored -> query.getQueryResults(token, uriInfo, useHttpsUrlInResponse), responseExecutor)
                 .transform(this::createQueryResultsResponse, directExecutor());
     }
 
@@ -280,12 +280,12 @@ public class QueuedStatementResource
             Optional<URI> queryInfoUrl,
             Duration elapsedTime,
             Duration queuedTime,
-            Optional<String> queryResultUrlScheme)
+            boolean useHttpsUrlInResponse)
     {
         QueryState state = queryError.map(error -> FAILED).orElse(QUEUED);
         return new QueryResults(
                 queryId.toString(),
-                getQueryInfoUri(queryInfoUrl, queryId, uriInfo, queryResultUrlScheme),
+                getQueryInfoUri(queryInfoUrl, queryId, uriInfo, useHttpsUrlInResponse),
                 null,
                 nextUri,
                 null,
@@ -382,7 +382,7 @@ public class QueuedStatementResource
             }
         }
 
-        public QueryResults getQueryResults(long token, UriInfo uriInfo, Optional<String> queryResultUrlScheme)
+        public QueryResults getQueryResults(long token, UriInfo uriInfo, boolean useHttpsUrlInResponse)
         {
             long lastToken = this.lastToken.get();
             // token should be the last token or the next token
@@ -398,7 +398,7 @@ public class QueuedStatementResource
                         token + 1,
                         uriInfo,
                         DispatchInfo.queued(NO_DURATION, NO_DURATION),
-                        queryResultUrlScheme);
+                        useHttpsUrlInResponse);
             }
 
             DispatchInfo dispatchInfo = dispatchManager.getDispatchInfo(queryId)
@@ -407,7 +407,7 @@ public class QueuedStatementResource
                             .status(NOT_FOUND)
                             .build()));
 
-            return createQueryResults(token + 1, uriInfo, dispatchInfo, queryResultUrlScheme);
+            return createQueryResults(token + 1, uriInfo, dispatchInfo, useHttpsUrlInResponse);
         }
 
         public void cancel()
@@ -420,19 +420,19 @@ public class QueuedStatementResource
             sessionContext.getIdentity().destroy();
         }
 
-        private QueryResults createQueryResults(long token, UriInfo uriInfo, DispatchInfo dispatchInfo, Optional<String> queryResultUrlScheme)
+        private QueryResults createQueryResults(long token, UriInfo uriInfo, DispatchInfo dispatchInfo, boolean useHttpsUrlInResponse)
         {
-            URI nextUri = getNextUri(token, uriInfo, dispatchInfo);
+            URI nextUri = getNextUri(token, uriInfo, dispatchInfo, useHttpsUrlInResponse);
 
             Optional<URI> queryInfoUrlFinal = queryInfoUrl;
 
-            if (queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty()) {
+            if (useHttpsUrlInResponse) {
                 if (nextUri != null) {
-                    nextUri = UriBuilder.fromUri(nextUri).scheme(queryResultUrlScheme.get()).build();
+                    nextUri = UriBuilder.fromUri(nextUri).scheme("https").build();
                 }
 
                 if (queryInfoUrlFinal.isPresent()) {
-                    queryInfoUrlFinal = Optional.of(UriBuilder.fromUri(queryInfoUrlFinal.get()).scheme(queryResultUrlScheme.get()).build());
+                    queryInfoUrlFinal = Optional.of(UriBuilder.fromUri(queryInfoUrlFinal.get()).scheme("https").build());
                 }
             }
 
@@ -447,10 +447,10 @@ public class QueuedStatementResource
                     queryInfoUrlFinal,
                     dispatchInfo.getElapsedTime(),
                     dispatchInfo.getQueuedTime(),
-                    queryResultUrlScheme);
+                    useHttpsUrlInResponse);
         }
 
-        private URI getNextUri(long token, UriInfo uriInfo, DispatchInfo dispatchInfo)
+        private URI getNextUri(long token, UriInfo uriInfo, DispatchInfo dispatchInfo, boolean useHttpsUrlInResponse)
         {
             // if failed, query is complete
             if (dispatchInfo.getFailureInfo().isPresent()) {
@@ -458,15 +458,18 @@ public class QueuedStatementResource
             }
             // if dispatched, redirect to new uri
             return dispatchInfo.getCoordinatorLocation()
-                    .map(coordinatorLocation -> getRedirectUri(coordinatorLocation, uriInfo))
+                    .map(coordinatorLocation -> getRedirectUri(coordinatorLocation, uriInfo, useHttpsUrlInResponse))
                     .orElseGet(() -> getQueuedUri(queryId, slug, token, uriInfo));
         }
 
-        private URI getRedirectUri(CoordinatorLocation coordinatorLocation, UriInfo uriInfo)
+        private URI getRedirectUri(CoordinatorLocation coordinatorLocation, UriInfo uriInfo, boolean useHttpsUrlInResponse)
         {
             URI coordinatorUri = coordinatorLocation.getUri(uriInfo);
-            return UriBuilder.fromUri(coordinatorUri)
-                    .replacePath("/v1/statement/executing")
+            UriBuilder uriBuilder = UriBuilder.fromUri(coordinatorUri);
+            if (useHttpsUrlInResponse) {
+                uriBuilder = uriBuilder.scheme("https");
+            }
+            return uriBuilder.replacePath("/v1/statement/executing")
                     .path(queryId.toString())
                     .path(slug.makeSlug(EXECUTING_QUERY, 0))
                     .path("0")

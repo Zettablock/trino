@@ -120,4 +120,9 @@ public class ServerConfig
         this.queryResultUrlScheme = Optional.ofNullable(queryResultUrlScheme);
         return this;
     }
+
+    public boolean useHttpsUrlInResponse()
+    {
+        return queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty();
+    }
 }

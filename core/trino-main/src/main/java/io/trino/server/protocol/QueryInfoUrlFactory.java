@@ -28,10 +28,13 @@ public class QueryInfoUrlFactory
 {
     private final Optional<String> queryInfoUrlTemplate;
 
+    private final boolean useHttpsUrlInResponse;
+
     @Inject
     public QueryInfoUrlFactory(ServerConfig serverConfig)
     {
         this.queryInfoUrlTemplate = serverConfig.getQueryInfoUrlTemplate();
+        this.useHttpsUrlInResponse = serverConfig.useHttpsUrlInResponse();
 
         // verify the template is a valid URL
         queryInfoUrlTemplate.ifPresent(template -> {
@@ -46,16 +49,20 @@ public class QueryInfoUrlFactory
 
     public Optional<URI> getQueryInfoUrl(QueryId queryId)
     {
-        return queryInfoUrlTemplate
+        Optional<URI> result = queryInfoUrlTemplate
                 .map(template -> template.replace("${QUERY_ID}", queryId.toString()))
                 .map(URI::create);
+        if (useHttpsUrlInResponse && result.isPresent()) {
+            result = Optional.of(UriBuilder.fromUri(result.get()).scheme("https").build());
+        }
+        return result;
     }
 
-    public static URI getQueryInfoUri(Optional<URI> queryInfoUrl, QueryId queryId, UriInfo uriInfo, Optional<String> queryResultUrlScheme)
+    public static URI getQueryInfoUri(Optional<URI> queryInfoUrl, QueryId queryId, UriInfo uriInfo, boolean useHttpsUrlInResponse)
     {
         UriBuilder uriBuilder = uriInfo.getRequestUriBuilder();
-        if (queryResultUrlScheme.isPresent() && queryResultUrlScheme.get() != null && !queryResultUrlScheme.get().isEmpty()) {
-            uriBuilder = uriBuilder.scheme(queryResultUrlScheme.get());
+        if (useHttpsUrlInResponse) {
+            uriBuilder = uriBuilder.scheme("https");
         }
         UriBuilder uriBuilderFinal = uriBuilder;
         return queryInfoUrl.orElseGet(() ->

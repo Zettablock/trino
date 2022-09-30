@@ -94,7 +94,7 @@ public class ExecutingStatementResource
     private final PreparedStatementEncoder preparedStatementEncoder;
     private final boolean compressionEnabled;
 
-    private final Optional<String> queryResultUrlScheme;
+    private final boolean useHttpsUrlInResponse;
 
     @Inject
     public ExecutingStatementResource(
@@ -117,7 +117,7 @@ public class ExecutingStatementResource
         this.timeoutExecutor = requireNonNull(timeoutExecutor, "timeoutExecutor is null");
         this.preparedStatementEncoder = requireNonNull(preparedStatementEncoder, "preparedStatementEncoder is null");
         this.compressionEnabled = serverConfig.isQueryResultsCompressionEnabled();
-        this.queryResultUrlScheme = serverConfig.getQueryResultUrlScheme();
+        this.useHttpsUrlInResponse = serverConfig.useHttpsUrlInResponse();
 
         queryPurger.scheduleWithFixedDelay(
                 () -> {
@@ -211,7 +211,7 @@ public class ExecutingStatementResource
                 responseExecutor,
                 timeoutExecutor,
                 blockEncodingSerde,
-                queryResultUrlScheme));
+                useHttpsUrlInResponse));
         return query;
     }
 
