@@ -282,4 +282,10 @@
             <unpack />
         </artifact>
     </artifactSet>
+
+    <artifactSet to="plugin/zettablock">
+        <artifact id="${project.groupId}:trino-zettablock:zip:${project.version}">
+            <unpack />
+        </artifact>
+    </artifactSet>
 </runtime>
