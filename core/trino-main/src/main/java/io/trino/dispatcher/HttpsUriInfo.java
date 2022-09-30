@@ -22,6 +22,7 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
 
+// TODO zettablock delete this file
 public class HttpsUriInfo
         implements UriInfo
 {

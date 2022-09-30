@@ -163,9 +163,6 @@ public class QueuedStatementResource
             @Context HttpHeaders httpHeaders,
             @Context UriInfo uriInfo)
     {
-        if (useHttpsUrlInResponse) {
-            uriInfo = new HttpsUriInfo(uriInfo);
-        }
         if (isNullOrEmpty(statement)) {
             throw badRequest(BAD_REQUEST, "SQL statement is empty");
         }
@@ -207,9 +204,6 @@ public class QueuedStatementResource
             @Context UriInfo uriInfo,
             @Suspended AsyncResponse asyncResponse)
     {
-        if (useHttpsUrlInResponse) {
-            uriInfo = new HttpsUriInfo(uriInfo);
-        }
         Query query = getQuery(queryId, slug, token);
 
         ListenableFuture<Response> future = getStatus(query, token, maxWait, uriInfo);
