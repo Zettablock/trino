@@ -52,7 +52,6 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URLEncoder;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
