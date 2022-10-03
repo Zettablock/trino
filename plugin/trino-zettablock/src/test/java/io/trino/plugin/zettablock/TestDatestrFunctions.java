@@ -13,22 +13,24 @@
  */
 package io.trino.plugin.zettablock;
 
-import com.google.common.collect.ImmutableSet;
-import io.trino.plugin.zettablock.udf.ConvertHexToBigIntegerStringFunction;
 import io.trino.plugin.zettablock.udf.DatestrFunctions;
-import io.trino.spi.Plugin;
+import org.testng.annotations.Test;
 
-import java.util.Set;
+import static io.trino.testing.assertions.Assert.assertEquals;
 
-public class ZettablockPlugin
-        implements Plugin
+public class TestDatestrFunctions
 {
-    @Override
-    public Set<Class<?>> getFunctions()
+    @Test
+    public void testDatestrFromUnixtimeImpl()
     {
-        return ImmutableSet.<Class<?>>builder()
-                .add(ConvertHexToBigIntegerStringFunction.class)
-                .add(DatestrFunctions.class)
-                .build();
+        String result = DatestrFunctions.datestrFromUnixtimeImpl(1664582400.000);
+        assertEquals(result, "2022-10-01");
+    }
+
+    @Test
+    public void testDatehourFromUnixtimeImpl()
+    {
+        Integer result = DatestrFunctions.datehourFromUnixtimeImpl(1664582400.000);
+        assertEquals(result, Integer.valueOf(2022100100));
     }
 }
