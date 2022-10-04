@@ -54,14 +54,14 @@ public class DatestrFunctions
     @Description("DatehourFromUnixtime")
     @SqlType(StandardTypes.INTEGER)
     @SqlNullable
-    public static Integer datehourFromUnixtime(@SqlNullable @SqlType(StandardTypes.DOUBLE) Double unixtime)
+    public static Long datehourFromUnixtime(@SqlNullable @SqlType(StandardTypes.DOUBLE) Double unixtime)
     {
         if (unixtime == null) {
             return null;
         }
 
         try {
-            Integer result = datehourFromUnixtimeImpl(unixtime);
+            Long result = datehourFromUnixtimeImpl(unixtime);
             return result;
         }
         catch (Throwable e) {
@@ -80,7 +80,7 @@ public class DatestrFunctions
         return result;
     }
 
-    public static Integer datehourFromUnixtimeImpl(Double unixtime)
+    public static Long datehourFromUnixtimeImpl(Double unixtime)
     {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("UTC")));
         calendar.setTimeInMillis((long) (unixtime * 1000));
@@ -88,7 +88,7 @@ public class DatestrFunctions
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int result = year * 1000000 + month * 10000 + day * 100 + hour;
+        long result = year * 1000000 + month * 10000 + day * 100 + hour;
         return result;
     }
 }

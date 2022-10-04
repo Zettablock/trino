@@ -30,13 +30,13 @@ public class TestDatestrFunctions
     @Test
     public void testDatehourFromUnixtimeImpl()
     {
-        Integer result = DatestrFunctions.datehourFromUnixtimeImpl(1664582400.000);
-        assertEquals(result, Integer.valueOf(2022100100));
+        Long result = DatestrFunctions.datehourFromUnixtimeImpl(1664582400.000);
+        assertEquals(result, Long.valueOf(2022100100));
 
         result = DatestrFunctions.datehourFromUnixtimeImpl(1664582400.000 - 60 * 60);
-        assertEquals(result, Integer.valueOf(2022093023));
+        assertEquals(result, Long.valueOf(2022093023));
 
         result = DatestrFunctions.datehourFromUnixtimeImpl(1664582400.000 - 24 * 60 * 60);
-        assertEquals(result, Integer.valueOf(2022093000));
+        assertEquals(result, Long.valueOf(2022093000));
     }
 }
