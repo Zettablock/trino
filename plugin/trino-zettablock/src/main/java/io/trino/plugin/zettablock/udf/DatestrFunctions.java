@@ -52,7 +52,7 @@ public class DatestrFunctions
 
     @ScalarFunction("DatehourFromUnixtime")
     @Description("DatehourFromUnixtime")
-    @SqlType(StandardTypes.INTEGER)
+    @SqlType(StandardTypes.BIGINT)
     @SqlNullable
     public static Long datehourFromUnixtime(@SqlNullable @SqlType(StandardTypes.DOUBLE) Double unixtime)
     {
