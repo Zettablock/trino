@@ -20,6 +20,7 @@ import io.trino.spi.function.ScalarFunction;
 import io.trino.spi.function.SqlType;
 import io.trino.spi.type.StandardTypes;
 
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -59,7 +60,7 @@ public class DatestrFunctions
 
     public static String datestrFromUnixtimeImpl(Double unixtime)
     {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("UTC")));
         calendar.setTimeInMillis((long) (unixtime * 1000));
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
@@ -70,7 +71,7 @@ public class DatestrFunctions
 
     public static Integer datehourFromUnixtimeImpl(Double unixtime)
     {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("UTC")));
         calendar.setTimeInMillis((long) (unixtime * 1000));
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
