@@ -17,6 +17,7 @@ import io.airlift.slice.Slice;
 import io.airlift.slice.Slices;
 import io.trino.spi.function.Description;
 import io.trino.spi.function.ScalarFunction;
+import io.trino.spi.function.SqlNullable;
 import io.trino.spi.function.SqlType;
 import io.trino.spi.type.StandardTypes;
 
@@ -33,22 +34,32 @@ public class DatestrFunctions
     @ScalarFunction("DatestrFromUnixtime")
     @Description("DatestrFromUnixtime")
     @SqlType(StandardTypes.VARCHAR)
-    public static Slice datestrFromUnixtime(@SqlType(StandardTypes.DOUBLE) Double unixtime)
+    @SqlNullable
+    public static Slice datestrFromUnixtime(@SqlNullable @SqlType(StandardTypes.DOUBLE) Double unixtime)
     {
+        if (unixtime == null) {
+            return null;
+        }
+
         try {
             String result = datestrFromUnixtimeImpl(unixtime);
             return Slices.utf8Slice(result);
         }
         catch (Throwable e) {
-            return Slices.utf8Slice("");
+            return null;
         }
     }
 
     @ScalarFunction("DatehourFromUnixtime")
     @Description("DatehourFromUnixtime")
     @SqlType(StandardTypes.INTEGER)
-    public static Integer datehourFromUnixtime(@SqlType(StandardTypes.DOUBLE) Double unixtime)
+    @SqlNullable
+    public static Integer datehourFromUnixtime(@SqlNullable @SqlType(StandardTypes.DOUBLE) Double unixtime)
     {
+        if (unixtime == null) {
+            return null;
+        }
+
         try {
             Integer result = datehourFromUnixtimeImpl(unixtime);
             return result;
