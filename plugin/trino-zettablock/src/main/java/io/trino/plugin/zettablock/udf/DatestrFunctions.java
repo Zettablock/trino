@@ -60,7 +60,7 @@ public class DatestrFunctions
     public static String datestrFromUnixtimeImpl(Double unixtime)
     {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.setTimeInMillis((long)(unixtime*1000));
+        calendar.setTimeInMillis((long) (unixtime * 1000));
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -71,7 +71,7 @@ public class DatestrFunctions
     public static Integer datehourFromUnixtimeImpl(Double unixtime)
     {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.setTimeInMillis((long)(unixtime*1000));
+        calendar.setTimeInMillis((long) (unixtime * 1000));
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);

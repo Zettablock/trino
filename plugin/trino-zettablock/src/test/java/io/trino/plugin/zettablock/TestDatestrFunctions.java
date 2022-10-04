@@ -32,5 +32,11 @@ public class TestDatestrFunctions
     {
         Integer result = DatestrFunctions.datehourFromUnixtimeImpl(1664582400.000);
         assertEquals(result, Integer.valueOf(2022100100));
+
+        result = DatestrFunctions.datehourFromUnixtimeImpl(1664582400.000 - 60 * 60);
+        assertEquals(result, Integer.valueOf(2022093023));
+
+        result = DatestrFunctions.datehourFromUnixtimeImpl(1664582400.000 - 24 * 60 * 60);
+        assertEquals(result, Integer.valueOf(2022093000));
     }
 }
