@@ -21,11 +21,9 @@ import io.trino.spi.Plugin;
 import java.util.Set;
 
 public class ZettablockPlugin
-        implements Plugin
-{
+        implements Plugin {
     @Override
-    public Set<Class<?>> getFunctions()
-    {
+    public Set<Class<?>> getFunctions() {
         return ImmutableSet.<Class<?>>builder()
                 .add(ConvertHexToBigIntegerStringFunction.class)
                 .add(DatestrFunctions.class)
