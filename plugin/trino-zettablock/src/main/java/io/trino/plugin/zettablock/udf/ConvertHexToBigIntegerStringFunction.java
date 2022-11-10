@@ -33,7 +33,6 @@ public class ConvertHexToBigIntegerStringFunction
     @SqlType(StandardTypes.VARCHAR)
     public static Slice convertHexToBigInteger(@SqlType(StandardTypes.VARCHAR) Slice slice)
     {
-        String digits = "0123456789ABCDEF";
         try {
             String argument = slice.toStringUtf8();
             String result = convertHexToBigIntegerImpl(argument);
