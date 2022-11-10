@@ -1909,7 +1909,7 @@
                     </configuration>
                 </plugin>
 
-                <plugin>
+                <!--<plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <configuration>
@@ -1926,7 +1926,6 @@
                             </compound>
                             <requireUpperBoundDeps>
                                 <excludes combine.children="append">
-                                    <!-- TODO: fix this in Airlift resolver -->
                                     <exclude>org.codehaus.plexus:plexus-utils</exclude>
                                     <exclude>com.google.guava:guava</exclude>
                                     <exclude>com.fasterxml.jackson.core:jackson-core</exclude>
@@ -1935,7 +1934,6 @@
                             </requireUpperBoundDeps>
                             <bannedDependencies>
                                 <excludes combine.children="append">
-                                    <!-- We don't use log4j2, additionally versions < 2.15.0 are vulnerable to the RCE Log4Shell (CVE-2021-44228) -->
                                     <exclude>org.apache.logging.log4j:log4j-core</exclude>
                                 </excludes>
                             </bannedDependencies>
@@ -1948,7 +1946,7 @@
                             <version>2.0.0</version>
                         </dependency>
                     </dependencies>
-                </plugin>
+                </plugin>-->
 
                 <plugin>
                     <groupId>ca.vanzyl.provisio.maven.plugins</groupId>
