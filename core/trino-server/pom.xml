@@ -28,13 +28,13 @@
 
     <build>
         <plugins>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <configuration>
                     <rules combine.self="override">
                         <requireFilesSize>
-                            <!-- Maven Central has a 1GB limit -->
+                            <- Maven Central has a 1GB limit ->
                             <maxsize>1073741824</maxsize>
                             <files>
                                 <file>${project.build.directory}/${project.artifactId}-${project.version}.tar.gz</file>
@@ -50,7 +50,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 </project>

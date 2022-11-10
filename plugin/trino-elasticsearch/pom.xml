@@ -372,20 +372,20 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
+                <!--<plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <configuration>
                         <rules>
                             <requireUpperBoundDeps>
                                 <excludes combine.children="append">
-                                    <!-- trino-main depends on 8.4.1 while org.elasticsearch:elasticsearch:6.8.23 depends on 7.7.3 -->
+                                    <- trino-main depends on 8.4.1 while org.elasticsearch:elasticsearch:6.8.23 depends on 7.7.3 ->
                                     <exclude>org.apache.lucene:lucene-core</exclude>
                                 </excludes>
                             </requireUpperBoundDeps>
                         </rules>
                     </configuration>
-                </plugin>
+                </plugin>-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
