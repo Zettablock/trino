@@ -88,6 +88,8 @@
         <air.test.jvmsize>3g</air.test.jvmsize>
 
         <air.javadoc.lint>-missing</air.javadoc.lint>
+
+        <enforcer.skip>true</enforcer.skip>
     </properties>
 
     <modules>
