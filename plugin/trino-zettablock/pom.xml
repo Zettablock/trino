@@ -179,6 +179,9 @@
                         <requireUpperBoundDeps>
                             <excludes combine.children="append">
                                 <exclude>com.google.guava:guava</exclude>
+                                <exclude>com.squareup.okhttp3:okhttp</exclude>
+                                <exclude>com.squareup.okhttp3:okhttp-urlconnection</exclude>
+                                <exclude>com.squareup.okhttp3:logging-interceptor</exclude>
                             </excludes>
                         </requireUpperBoundDeps>
                     </rules>
