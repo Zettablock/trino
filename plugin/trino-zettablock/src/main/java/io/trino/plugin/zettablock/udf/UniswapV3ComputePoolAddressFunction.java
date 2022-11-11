@@ -41,13 +41,13 @@ public class UniswapV3ComputePoolAddressFunction {
     @ScalarFunction("UniV3ComputePoolAddr")
     @Description("Compute Uniswap V3 pool address from pool key."
             + "Refer to https://github.com/Uniswap/v3-periphery/blob/75f3b72b4412b41e31c2a2370bb52d55f99ec717/contracts/libraries/PoolAddress.sol#L33")
-    @SqlType(StandardTypes.BIGINT)
+    @SqlType(StandardTypes.VARCHAR)
     @SqlNullable
     public static Slice uniswapV3ComputePoolAddress(
             @SqlType(StandardTypes.VARCHAR) String factory,
             @SqlType(StandardTypes.VARCHAR) String token0,
             @SqlType(StandardTypes.VARCHAR) String token1,
-            @SqlType(StandardTypes.INTEGER) Integer fee) {
+            @SqlNullable @SqlType(StandardTypes.INTEGER) Integer fee) {
         try {
             String pool;
             BigInteger token0BigInt = Numeric.toBigInt(token0);
