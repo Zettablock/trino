@@ -35,7 +35,12 @@
 
         <dependency>
             <groupId>org.web3j</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>abi</artifactId>
+            <version>4.9.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>utils</artifactId>
             <version>4.9.5</version>
         </dependency>
 

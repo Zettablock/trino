@@ -14,9 +14,9 @@
 package io.trino.plugin.zettablock;
 
 import io.trino.plugin.zettablock.udf.UniswapV3ComputePoolAddressFunction;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.trino.testing.assertions.Assert.assertEquals;
 
 public class TestUniswapV3ComputePoolAddressFunction
 {
