@@ -44,18 +44,21 @@ public class UniswapV3ComputePoolAddressFunction {
     @SqlType(StandardTypes.VARCHAR)
     @SqlNullable
     public static Slice uniswapV3ComputePoolAddress(
-            @SqlType(StandardTypes.VARCHAR) String factory,
-            @SqlType(StandardTypes.VARCHAR) String token0,
-            @SqlType(StandardTypes.VARCHAR) String token1,
+            @SqlType(StandardTypes.VARCHAR) Slice factory,
+            @SqlType(StandardTypes.VARCHAR) Slice token0,
+            @SqlType(StandardTypes.VARCHAR) Slice token1,
             @SqlNullable @SqlType(StandardTypes.INTEGER) Integer fee) {
         try {
+            String factoryStr = factory.toStringUtf8();
+            String token0Str = token0.toStringUtf8();
+            String token1Str = token1.toStringUtf8();
             String pool;
-            BigInteger token0BigInt = Numeric.toBigInt(token0);
-            BigInteger token1BigInt = Numeric.toBigInt(token1);
+            BigInteger token0BigInt = Numeric.toBigInt(token0Str);
+            BigInteger token1BigInt = Numeric.toBigInt(token1Str);
             if (token0BigInt.compareTo(token1BigInt) == -1) {
-                pool = uniswapV3ComputePoolAddressImpl(factory, token0, token1, fee);
+                pool = uniswapV3ComputePoolAddressImpl(factoryStr, token0Str, token1Str, fee);
             } else {
-                pool = uniswapV3ComputePoolAddressImpl(factory, token1, token0, fee);
+                pool = uniswapV3ComputePoolAddressImpl(factoryStr, token1Str, token0Str, fee);
             }
             return Slices.utf8Slice(pool);
         } catch (Throwable e) {
