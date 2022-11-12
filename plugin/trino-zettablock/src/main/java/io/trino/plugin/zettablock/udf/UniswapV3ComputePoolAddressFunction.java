@@ -47,7 +47,7 @@ public class UniswapV3ComputePoolAddressFunction {
             @SqlType(StandardTypes.VARCHAR) Slice factory,
             @SqlType(StandardTypes.VARCHAR) Slice token0,
             @SqlType(StandardTypes.VARCHAR) Slice token1,
-            @SqlNullable @SqlType(StandardTypes.INTEGER) Integer fee) {
+            @SqlNullable @SqlType(StandardTypes.INTEGER) Long fee) {
         try {
             String factoryStr = factory.toStringUtf8();
             String token0Str = token0.toStringUtf8();
@@ -70,7 +70,7 @@ public class UniswapV3ComputePoolAddressFunction {
             String factory,
             String token0,
             String token1,
-            Integer fee) {
+            Long fee) {
         Bytes prefix = new Bytes1(Numeric.hexStringToByteArray("0xff")); // hex ff
         String poolKey = Hash.sha3(TypeEncoder.encode(
                 new StaticStruct(
