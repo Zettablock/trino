@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableSet;
 import io.trino.plugin.zettablock.udf.ConvertHexToBigIntegerStringFunction;
 import io.trino.plugin.zettablock.udf.DatestrFunctions;
 import io.trino.plugin.zettablock.udf.UniswapV3ComputePoolAddressFunction;
+import io.trino.plugin.zettablock.udf.UniswapV3GetLiquidityAmountsFunction;
 import io.trino.spi.Plugin;
 
 import java.util.Set;
@@ -31,6 +32,7 @@ public class ZettablockPlugin
                 .add(ConvertHexToBigIntegerStringFunction.class)
                 .add(DatestrFunctions.class)
                 .add(UniswapV3ComputePoolAddressFunction.class)
+                .add(UniswapV3GetLiquidityAmountsFunction.class)
                 .build();
     }
 }

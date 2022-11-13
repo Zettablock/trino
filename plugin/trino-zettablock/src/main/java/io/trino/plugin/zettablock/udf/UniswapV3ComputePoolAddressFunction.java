@@ -24,9 +24,9 @@ import org.web3j.abi.TypeEncoder;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Bytes;
 import org.web3j.abi.datatypes.StaticStruct;
-import org.web3j.abi.datatypes.generated.Uint24;
 import org.web3j.abi.datatypes.generated.Bytes1;
 import org.web3j.abi.datatypes.generated.Bytes32;
+import org.web3j.abi.datatypes.generated.Uint24;
 import org.web3j.crypto.Hash;
 import org.web3j.utils.Numeric;
 
@@ -47,7 +47,7 @@ public class UniswapV3ComputePoolAddressFunction {
             @SqlType(StandardTypes.VARCHAR) Slice factory,
             @SqlType(StandardTypes.VARCHAR) Slice token0,
             @SqlType(StandardTypes.VARCHAR) Slice token1,
-            @SqlNullable @SqlType(StandardTypes.INTEGER) Long fee) {
+            @SqlNullable @SqlType(StandardTypes.BIGINT) Long fee) {
         try {
             String factoryStr = factory.toStringUtf8();
             String token0Str = token0.toStringUtf8();
