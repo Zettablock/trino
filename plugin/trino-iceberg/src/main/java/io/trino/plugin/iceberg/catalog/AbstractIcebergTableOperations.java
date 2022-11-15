@@ -220,8 +220,18 @@ public abstract class AbstractIcebergTableOperations
                 .retry(20)
                 .exponentialBackoff(100, 5000, 600000, 4.0)
                 .stopRetryOn(org.apache.iceberg.exceptions.NotFoundException.class) // qualified name, as this is NOT the io.trino.spi.connector.NotFoundException
-                .run(metadataLocation -> newMetadata.set(
-                        TableMetadataParser.read(fileIo, io().newInputFile(metadataLocation))));
+                .run(metadataLocation ->
+                {
+                    try {
+                        newMetadata.set(
+                                TableMetadataParser.read(fileIo, io().newInputFile(metadataLocation)));
+                    } catch (Throwable ex) {
+                        throw new RuntimeException(
+                                String.format("ZettaBlock added info, table: %s, current location: %s, new location%s",
+                                        this.tableName, currentMetadataLocation, newLocation),
+                                ex);
+                    }
+                });
 
         String newUUID = newMetadata.get().uuid();
         if (currentMetadata != null) {

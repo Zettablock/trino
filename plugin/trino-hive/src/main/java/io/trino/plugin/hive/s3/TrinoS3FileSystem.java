@@ -1273,7 +1273,10 @@ public class TrinoS3FileSystem
                             catch (Exception e) {
                                 STATS.newReadError(e);
                                 closeStream();
-                                throw e;
+                                throw new RuntimeException(
+                                        String.format("ZettaBlock added info: s3 bucket: %s, path: %s",
+                                                this.bucket, this.path),
+                                        e);
                             }
                         });
 
