@@ -32,7 +32,7 @@ public class ArrayExampleFunction
 
     @ScalarFunction("ArrayExample")
     @Description("Example UDF returning Array")
-    @SqlType(StandardTypes.ARRAY)
+    @SqlType("array(varchar)")
     public static Block arrayExample(@SqlType(StandardTypes.VARCHAR) Slice slice)
     {
         try {
