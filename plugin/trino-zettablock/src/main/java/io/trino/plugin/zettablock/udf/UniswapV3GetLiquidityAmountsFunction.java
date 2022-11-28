@@ -39,7 +39,7 @@ public class UniswapV3GetLiquidityAmountsFunction {
     @ScalarFunction("UniV3GetLiquidityAmounts")
     @Description("Get Uniswap V3 token0 and token1 amounts from liquidity."
             + "Refer to https://github.com/Uniswap/v3-periphery/blob/75f3b72b4412b41e31c2a2370bb52d55f99ec717/contracts/libraries/LiquidityAmounts.sol#L120")
-    @SqlType(StandardTypes.ARRAY)
+    @SqlType("array(varchar)")
     @SqlNullable
     public static Block uniswapV3GetLiquidityAmounts(
             @SqlType(StandardTypes.VARCHAR) Slice sqrtRatioX96,
