@@ -11,9 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trino.plugin.zettablock;
+package io.trino.plugin.zettablock.udf;
 
-import io.trino.plugin.zettablock.udf.UniswapV3GetLiquidityAmountsFunction;
 import org.testng.annotations.Test;
 
 import static io.trino.testing.assertions.Assert.assertEquals;

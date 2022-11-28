@@ -11,19 +11,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trino.plugin.zettablock;
+package io.trino.plugin.zettablock.udf;
 
-import io.trino.plugin.zettablock.udf.ConvertHexToBigIntegerStringFunction;
+import io.airlift.slice.Slice;
+import io.airlift.slice.Slices;
+import io.trino.spi.block.Block;
+import io.trino.spi.block.VariableWidthBlock;
 import org.testng.annotations.Test;
 
 import static io.trino.testing.assertions.Assert.assertEquals;
 
-public class TestConvertHexToBigIntegerStringFunction
+public class TestArrayExampleFunction
 {
     @Test
-    public void testConvertHexToBigInteger()
+    public void testArrayExample()
     {
-        String result = ConvertHexToBigIntegerStringFunction.convertHexToBigIntegerImpl("0xa");
-        assertEquals(result, "10");
+        Slice slice = Slices.utf8Slice("hello");
+        Block block = ArrayExampleFunction.arrayExample(slice);
+        assertEquals(VariableWidthBlock.class, block.getClass());
     }
 }
