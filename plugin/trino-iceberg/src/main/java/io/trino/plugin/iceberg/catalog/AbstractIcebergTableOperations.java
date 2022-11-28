@@ -227,7 +227,7 @@ public abstract class AbstractIcebergTableOperations
                                 TableMetadataParser.read(fileIo, io().newInputFile(metadataLocation)));
                     } catch (Throwable ex) {
                         throw new RuntimeException(
-                                String.format("ZettaBlock added info, table: %s, current location: %s, new location%s",
+                                String.format("ZettaBlock added info, table: %s, current location: %s, new location: %s",
                                         this.tableName, currentMetadataLocation, newLocation),
                                 ex);
                     }
